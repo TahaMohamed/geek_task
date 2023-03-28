@@ -22,6 +22,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('city_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->text('description')->nullable();
             $table->string('locale')->index();
             $table->unique(['city_id', 'locale']);
         });

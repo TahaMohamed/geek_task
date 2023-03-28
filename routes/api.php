@@ -3,7 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\{
-    CountryController
+    CountryController,
+    CityController
 };
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -11,4 +12,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::resources([
     'countries' => CountryController::class,
+    'cities' => CityController::class,
 ],['except' => ['create']]);
+
+//Route::resource('country.cities', CityController::class)->except('create')->shallow();
+Route::get('country.cities', [CityController::class, 'index']);
