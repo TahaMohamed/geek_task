@@ -11,27 +11,19 @@ class StatisticObserver
 {
     public function creating(Model $model)
     {
-        if ($model instanceof User && $model->user_type != UserType::superadmin()) {
-            self::incrementCount($model->user_type. '_count', $model->created_at->format('Y-m-d'));
-        } else {
-            self::incrementCount(mb_strtolower(class_basename(get_class($model))) . '_count', $model->created_at->format('Y-m-d'));
-        }
+        self::incrementCount(mb_strtolower(class_basename($model::class)) . '_count');
     }
 
 
     public function deleted(Model $model)
     {
-        if ($model instanceof User && $model->user_type != UserType::superadmin()) {
-            self::decrementCount($model->user_type. '_count', $model->created_at->format('Y-m-d'));
-        } else {
-            self::decrementCount(mb_strtolower(class_basename(get_class($model))) . '_count', $model->created_at->format('Y-m-d'));
-        }
+        self::decrementCount(mb_strtolower(class_basename($model::class)) . '_count', $model->created_at->format('Y-m-d'));
     }
 
 
-    public static function incrementCount($key, $added_at): void
+    public static function incrementCount($key): void
     {
-        $statistic = Statistic::firstOrCreate(['key' => $key, 'added_at' => $added_at], ['value' => 0]);
+        $statistic = Statistic::firstOrCreate(['key' => $key, 'added_at' => date('Y-m-d')], ['value' => 0]);
         $statistic->increment('value');
     }
 
@@ -39,5 +31,4 @@ class StatisticObserver
     {
         Statistic::where(['key'=> $key, 'added_at' => $added_at])->decrement('value');
     }
-
 }

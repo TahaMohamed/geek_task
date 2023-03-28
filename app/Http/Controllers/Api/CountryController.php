@@ -62,6 +62,6 @@ class CountryController extends Controller
             return $this->errorResponse(message: __('validation.country.restrict.cannot_delete_country_has_cities'));
         }
         $country->delete();
-        return $this->successResponse(message: __('dashboard.general.success_delete'));
+        return $this->successResponse(message: __('dashboard.message.success_delete'));
     }
 }

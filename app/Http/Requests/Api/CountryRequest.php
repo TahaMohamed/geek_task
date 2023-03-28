@@ -15,13 +15,12 @@ class CountryRequest extends FormRequest
     {
         $rules = [
             'is_active' => 'nullable|boolean',
-            'phone_code' => 'nullable|numeric|gt:0|digits_between:2,5'
+            'phone_code' => ['nullable','regex:/^(\+?\d{1,3}|\d{1,4})$/']
         ];
         foreach (config('translatable.locales') as $locale) {
             $rules["$locale.name"] = 'required|string|max:255|unique:country_translations,name,' . $this->country . ',country_id';
             $rules["$locale.description"] = 'nullable|string|max:500';
         }
         return $rules;
-
     }
 }
