@@ -16,4 +16,4 @@ Route::resources([
 ],['except' => ['create']]);
 
 //Route::resource('country.cities', CityController::class)->except('create')->shallow();
-Route::get('country.cities', [CityController::class, 'index']);
+Route::get('country/{country_id}/cities', [CityController::class, 'index']);
