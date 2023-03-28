@@ -3,27 +3,28 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\CityRequest;
-use App\Http\Resources\Api\CityResource;
-use App\Models\City;
+use App\Http\Requests\Api\AreaRequest;
+use App\Http\Resources\Api\AreaResource;
+use App\Models\Area;
 use Illuminate\Http\Request;
 
-class CityController extends Controller
+class AreaController extends Controller
 {
 
     public function index($country_id = null)
     {
-        $cities = City::query()
-            ->with('translation','country.translation','area.translation')
+        $areas = Area::query()
+            ->with('translation','country.translation')
+            ->withCount('cities')
             ->when($country_id, fn($q) => $q->where('country_id',$country_id))
             ->paginate((int)($request->per_page ?? config("globals.per_page")));
 
-        return $this->paginateResponse(data: CityResource::collection($cities), collection: $cities);
+        return $this->paginateResponse(data: AreaResource::collection($areas), collection: $areas);
     }
 
-    public function store(CityRequest $request)
+    public function store(AreaRequest $request)
     {
-        City::create($request->validated()); // + ['added_by_id' => auth()->id()] if auth
+        Area::create($request->validated()); // + ['added_by_id' => auth()->id()] if auth
         return $this->successResponse(message: __('dashboard.message.success_add'), code: 201);
     }
 
@@ -39,26 +40,27 @@ class CityController extends Controller
 
     private function showOrEdit(int $id, bool $show)
     {
-        $city = City::query()
-            ->with('country.translation','area.translation')
+        $area = Area::query()
+            ->with('country.translation')
+            ->withCount('cities')
             ->when(!$show, fn($q) => $q->with('translations'))
             ->when($show, fn($q) => $q->with('translation'))
             ->findOrFail($id);
 
-        return $this->successResponse(data: CityResource::make($city));
+        return $this->successResponse(data: AreaResource::make($area));
     }
 
-    public function update(CityRequest $request, $id)
+    public function update(AreaRequest $request, $id)
     {
-        $city = City::query()->where('country_id', $request->country_id)->findOrFail($id);
-        $city->update($request->validated());
+        $area = Area::query()->where('country_id', $request->country_id)->findOrFail($id);
+        $area->update($request->validated());
         return $this->successResponse(message: __('dashboard.message.success_update'));
     }
 
     public function destroy($id)
     {
-        $city = City::query()->findOrFail($id);
-        $city->delete();
+        $area = Area::query()->findOrFail($id);
+        $area->delete();
         return $this->successResponse(message: __('dashboard.message.success_delete'));
     }
 }

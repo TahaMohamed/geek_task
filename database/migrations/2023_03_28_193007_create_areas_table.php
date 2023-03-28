@@ -23,6 +23,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('area_id')->constrained()->cascadeOnDelete();
             $table->string('name');
+            $table->text('description')->nullable();
             $table->string('locale')->index();
             $table->unique(['area_id', 'locale']);
         });
