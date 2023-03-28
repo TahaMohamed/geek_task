@@ -16,14 +16,15 @@ class CityController extends Controller
         $cities = City::query()
             ->with('translation','country.translation','area.translation')
             ->when($country_id, fn($q) => $q->where('country_id',$country_id))
-            ->paginate((int)($request->per_page ?? config("globals.per_page")));
+            ->paginate((int)($request->per_page ?? config("globals.pagination.per_page")));
 
         return $this->paginateResponse(data: CityResource::collection($cities), collection: $cities);
     }
 
-    public function store(CityRequest $request)
+    public function store(CityRequest $request, City $city)
     {
-        City::create($request->validated()); // + ['added_by_id' => auth()->id()] if auth
+        $city->fill($request->validated())->save();
+        $this->updateCapitalsIfExists($city, $request);
         return $this->successResponse(message: __('dashboard.message.success_add'), code: 201);
     }
 
@@ -51,7 +52,8 @@ class CityController extends Controller
     public function update(CityRequest $request, $id)
     {
         $city = City::query()->where('country_id', $request->country_id)->findOrFail($id);
-        $city->update($request->validated());
+        $city->fill($request->validated())->save();
+        $this->updateCapitalsIfExists($city, $request);
         return $this->successResponse(message: __('dashboard.message.success_update'));
     }
 
@@ -60,5 +62,15 @@ class CityController extends Controller
         $city = City::query()->findOrFail($id);
         $city->delete();
         return $this->successResponse(message: __('dashboard.message.success_delete'));
+    }
+
+    private function updateCapitalsIfExists($city, $request): void
+    {
+        if ($request->is_country_capital){
+            $city->country()->update(['capital_city_id' => $city->id]);
+        }
+        if ($request->is_area_capital){
+            $city->area()->update(['capital_city_id' => $city->id]);
+        }
     }
 }

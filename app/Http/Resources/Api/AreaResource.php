@@ -25,6 +25,7 @@ class AreaResource extends JsonResource
                 'name' => $this->name,
                 'description' => $this->description,
                 'is_active' => (bool)$this->is_active,
+                'capital' => BasicDataResource::make($this->whenLoaded('capital')),
                 'country' => BasicDataResource::make($this->whenLoaded('country')),
                 'cities_count' => $this->whenCounted('cities'),
                 'created_at' => $this->created_at->format('Y-m-d'),

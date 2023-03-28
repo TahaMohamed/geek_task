@@ -14,10 +14,10 @@ class AreaController extends Controller
     public function index($country_id = null)
     {
         $areas = Area::query()
-            ->with('translation','country.translation')
+            ->with('translation','country.translation','capital.translation')
             ->withCount('cities')
             ->when($country_id, fn($q) => $q->where('country_id',$country_id))
-            ->paginate((int)($request->per_page ?? config("globals.per_page")));
+            ->paginate((int)($request->per_page ?? config("globals.pagination.per_page")));
 
         return $this->paginateResponse(data: AreaResource::collection($areas), collection: $areas);
     }
@@ -44,7 +44,7 @@ class AreaController extends Controller
             ->with('country.translation')
             ->withCount('cities')
             ->when(!$show, fn($q) => $q->with('translations'))
-            ->when($show, fn($q) => $q->with('translation'))
+            ->when($show, fn($q) => $q->with('translation','capital.translation'))
             ->findOrFail($id);
 
         return $this->successResponse(data: AreaResource::make($area));
@@ -59,7 +59,10 @@ class AreaController extends Controller
 
     public function destroy($id)
     {
-        $area = Area::query()->findOrFail($id);
+        $area = Area::query()->withCount('cities')->findOrFail($id);
+        if ($area->cities_count) {
+            return $this->errorResponse(message: __('validation.area.restrict.cannot_delete_area_has_cities'));
+        }
         $area->delete();
         return $this->successResponse(message: __('dashboard.message.success_delete'));
     }

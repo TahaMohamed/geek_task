@@ -25,6 +25,7 @@ class CountryResource extends JsonResource
                 'name' => $this->name,
                 'description' => $this->description,
                 'is_active' => (bool)$this->is_active,
+                'capital' => BasicDataResource::make($this->whenLoaded('capital')),
                 'cities_count' => $this->whenCounted('cities'),
                 'areas_count' => $this->whenCounted('areas'),
                 'created_at' => $this->created_at->format('Y-m-d'),

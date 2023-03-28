@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('area_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('country_id')->constrained()->cascadeOnDelete();
+            //            $table->polygon('boundaries');
+            //            $table->point('center');
             $table->timestamps();
         });
 
@@ -26,6 +28,14 @@ return new class extends Migration
             $table->string('locale')->index();
             $table->unique(['city_id', 'locale']);
         });
+
+        Schema::table('countries', function (Blueprint $table) {
+            $table->foreignId('capital_city_id')->nullable()->constrained('cities')->nullOnDelete();
+        });
+
+        Schema::table('areas', function (Blueprint $table) {
+            $table->foreignId('capital_city_id')->nullable()->constrained('cities')->nullOnDelete();
+        });
     }
 
     /**
@@ -33,6 +43,16 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('countries', function (Blueprint $table) {
+            $table->dropForeign(['capital_city_id']);
+            $table->dropColumn('capital_city_id');
+        });
+
+        Schema::table('areas', function (Blueprint $table) {
+            $table->dropForeign(['capital_city_id']);
+            $table->dropColumn('capital_city_id');
+        });
+
         Schema::dropIfExists('city_translations');
         Schema::dropIfExists('cities');
     }

@@ -21,6 +21,11 @@ class Area extends Model implements TranslatableContract
         return $this->belongsTo(Country::class);
     }
 
+    public function capital(): BelongsTo
+    {
+        return $this->belongsTo(City::class, 'capital_city_id');
+    }
+
     public function cities(): HasMany
     {
         return $this->hasMany(City::class);

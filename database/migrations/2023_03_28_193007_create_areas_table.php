@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->boolean('is_active')->default(true);
             $table->foreignId('country_id')->constrained()->cascadeOnDelete();
+//            $table->polygon('boundaries');
+//            $table->point('center');
             $table->softDeletes();
             $table->timestamps();
         });

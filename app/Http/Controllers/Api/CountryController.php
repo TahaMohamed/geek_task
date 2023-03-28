@@ -14,9 +14,9 @@ class CountryController extends Controller
     public function index()
     {
         $countries = Country::query()
-            ->with('translation')
+            ->with('translation','capital.translation')
             ->withCount('cities', 'areas')
-            ->paginate((int)($request->per_page ?? config("globals.per_page")));
+            ->paginate((int)($request->per_page ?? config("globals.pagination.per_page")));
 
         return $this->paginateResponse(data: CountryResource::collection($countries), collection: $countries);
     }
@@ -42,7 +42,7 @@ class CountryController extends Controller
         $country = Country::query()
             ->withCount('cities', 'areas')
             ->when(!$show, fn($q) => $q->with('translations'))
-            ->when($show, fn($q) => $q->with('translation'))
+            ->when($show, fn($q) => $q->with('translation','capital.translation'))
             ->findOrFail($id);
 
         return $this->successResponse(data: CountryResource::make($country));
