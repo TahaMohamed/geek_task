@@ -17,6 +17,7 @@ class AreaController extends Controller
             ->with('translation','country.translation','capital.translation')
             ->withCount('cities')
             ->when($country_id, fn($q) => $q->where('country_id',$country_id))
+            ->latest('id')
             ->paginate((int)($request->per_page ?? config("globals.pagination.per_page")));
 
         return $this->paginateResponse(data: AreaResource::collection($areas), collection: $areas);

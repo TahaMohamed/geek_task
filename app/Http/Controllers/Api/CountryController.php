@@ -16,6 +16,7 @@ class CountryController extends Controller
         $countries = Country::query()
             ->with('translation','capital.translation')
             ->withCount('cities', 'areas')
+            ->latest('id')
             ->paginate((int)($request->per_page ?? config("globals.pagination.per_page")));
 
         return $this->paginateResponse(data: CountryResource::collection($countries), collection: $countries);

@@ -16,6 +16,7 @@ class CityController extends Controller
         $cities = City::query()
             ->with('translation','country.translation','area.translation')
             ->when($country_id, fn($q) => $q->where('country_id',$country_id))
+            ->latest('id')
             ->paginate((int)($request->per_page ?? config("globals.pagination.per_page")));
 
         return $this->paginateResponse(data: CityResource::collection($cities), collection: $cities);
