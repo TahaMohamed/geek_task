@@ -23,6 +23,7 @@ Laravel Task instructions:
 1. Set database credentials in `.env` file.
 1. `php artisan migrate --step`.
 1. `php artisan serve`.
+1. To watch requests that sent to server go to `localhost:8000/telescope`
 1. Use [Postman Collection](https://documenter.getpostman.com/view/6784299/2s93RRvsuR) for run api services
 
 ## Tesing
